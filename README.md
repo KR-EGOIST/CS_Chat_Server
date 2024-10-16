@@ -17,7 +17,7 @@
 ## ⚽ 구현 현황
 
 #### 1. 클라이언트와 서버 연동 (Listener)
-  - 동시 다발로 Connect 시도 시 순차적으로 Accept되도록 Async처리
+  - 동시 다발로 Connect 시도 시 순차적으로 Accept되도록 AcceptAsync처리
 
 #### 2. 문자열 Buffer 생성 및 Send, Recv
   - ## Recv
@@ -28,3 +28,11 @@
     - _sendQueue에 있는 Buffer를 전부 Dequeue하면서 _pendingList에 Add
     - _sendArgs.BufferList에 _pendingList를 할당한 뒤 SendAsync를 통해 Buffer를 한 번에 보냄
     - Buffer를 보낸 뒤 _sendArgs.BufferList와 _pendingList를 초기화
+
+#### 3. 클라이언트와 서버 연결 및 서버와 서버 연결을 위한 Connector
+  - ServerCore에 정의된 Connect, Receive, Send, Disconnect 부분을 공용으로 사용
+  - 추후 분산 처리 서버끼리 연결하기 위해서 Connector 정의
+  - 동시 다발로 클라이언트 접속 시 순차적으로 Connect되도록 ConnectAsync처리
+
+#### 4. ServerCore 라이브러리화, Server와 Client는 ServerCore 참조
+  - ServerCore -> Session에 정의된 Connect, Receive, Send, Disconnect 부분을 공용으로 사용 가능
