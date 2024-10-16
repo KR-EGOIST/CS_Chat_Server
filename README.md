@@ -36,3 +36,7 @@
 
 #### 4. ServerCore 라이브러리화, Server와 Client는 ServerCore 참조
   - ServerCore -> Session에 정의된 Connect, Receive, Send, Disconnect 부분을 공용으로 사용 가능
+
+#### 5. RecvBuffer 클래스 정의
+  - Receive 동작 시 buffer의 readPos, writePos를 통해 현재 버퍼의 있는 데이터의 크기 또는 남아있는 버퍼의 공간을 알아낼 수 있다.
+  - 예를 들어 TCP통신의 혼잡 제어로 인해 100바이트 중 80바이트만 왔을 때 RecvBuffer에 보관을 하고 있다가 나중에 20바이트를 추가로 받은 후 조립하는 과정을 처리
