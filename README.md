@@ -40,3 +40,7 @@
 #### 5. RecvBuffer 클래스 정의
   - Receive 동작 시 buffer의 readPos, writePos를 통해 현재 버퍼의 있는 데이터의 크기 또는 남아있는 버퍼의 공간을 알아낼 수 있다.
   - 예를 들어 TCP통신의 혼잡 제어로 인해 100바이트 중 80바이트만 왔을 때 RecvBuffer에 보관을 하고 있다가 나중에 20바이트를 추가로 받은 후 조립하는 과정을 처리
+
+#### 6. SendBuffer 클래스 정의
+  - ChunkSize 만큼의 큰 덩어리 byte배열을 만들어 잘라서 사용하는 방법으로 구현
+  - ThreadLocal을 통해서 각 쓰레드마다 고유한 SendBuffer를 사용하도록 구현
