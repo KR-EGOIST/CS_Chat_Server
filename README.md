@@ -44,3 +44,7 @@
 #### 6. SendBuffer 클래스 정의
   - ChunkSize 만큼의 큰 덩어리 byte배열을 만들어 잘라서 사용하는 방법으로 구현
   - ThreadLocal을 통해서 각 쓰레드마다 고유한 SendBuffer를 사용하도록 구현
+
+#### 7. PacketSession 클래스 정의
+  - 클라이언트로부터 전달받은 패킷을 Parsing 처리 후 컨텐츠 단으로 buffer 전달
+  - 컨텐츠 단에서 전달받은 buffer를 BitConverter를 통해 변환 및 추출
