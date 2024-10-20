@@ -20,36 +20,52 @@ namespace Server
     class PlayerInfoReq : Packet
     {
         public long playerId;
+        public string name;
 
         public PlayerInfoReq()
         {
             this.packetId = (ushort)PacketID.PlayerInfoReq;
         }
 
-        public override void Read(ArraySegment<byte> buffer)
+        public override void Read(ArraySegment<byte> segment)
         {
             ushort count = 0;
-            //ushort size = BitConverter.ToUInt16(buffer.Array, buffer.Offset);
-            count += 2;
-            //ushort id = BitConverter.ToUInt16(buffer.Array, buffer.Offset + count);
-            count += 2;
-            this.playerId = BitConverter.ToInt64(new ReadOnlySpan<byte>(buffer.Array, buffer.Offset + count, buffer.Count - count));
-            count += 8;
+
+            ReadOnlySpan<byte> s = new ReadOnlySpan<byte>(segment.Array, segment.Offset, segment.Count);
+
+            count += sizeof(ushort);    // size
+            count += sizeof(ushort);    // packetId
+            this.playerId = BitConverter.ToInt64(s.Slice(count, s.Length - count));
+            count += sizeof(long);      // playerId
+
+            // string
+            ushort nameLen = BitConverter.ToUInt16(s.Slice(count, s.Length - count));
+            count += sizeof(ushort);
+            this.name = Encoding.Unicode.GetString(s.Slice(count, nameLen));
         }
 
         public override ArraySegment<byte> Write()
         {
-            ArraySegment<byte> openSegment = SendBufferHelper.Open(4096);
+            ArraySegment<byte> segment = SendBufferHelper.Open(4096);
 
             ushort count = 0;
             bool success = true;
 
-            count += 2;
-            success &= BitConverter.TryWriteBytes(new Span<byte>(openSegment.Array, openSegment.Offset + count, openSegment.Count - count), this.packetId);
-            count += 2;
-            success &= BitConverter.TryWriteBytes(new Span<byte>(openSegment.Array, openSegment.Offset + count, openSegment.Count - count), this.playerId);
-            count += 8;
-            success &= BitConverter.TryWriteBytes(new Span<byte>(openSegment.Array, openSegment.Offset, openSegment.Count), count);
+            Span<byte> s = new Span<byte>(segment.Array, segment.Offset, segment.Count);
+
+            count += sizeof(ushort);
+            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.packetId);
+            count += sizeof(ushort);
+            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.playerId);
+            count += sizeof(long);
+
+            // string
+            ushort nameLen = (ushort)Encoding.Unicode.GetBytes(this.name, 0, this.name.Length, segment.Array, segment.Offset + count + sizeof(ushort));
+            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), nameLen);
+            count += sizeof(ushort);
+            count += nameLen;
+
+            success &= BitConverter.TryWriteBytes(s, count);
 
             if (success == false)
                 return null;
@@ -107,7 +123,7 @@ namespace Server
                     {
                         PlayerInfoReq p = new PlayerInfoReq();
                         p.Read(buffer);
-                        Console.WriteLine($"PlayerInfoReq: {p.playerId}");
+                        Console.WriteLine($"PlayerInfoReq: {p.playerId} {p.name}");
                     }
                     break;
             }
