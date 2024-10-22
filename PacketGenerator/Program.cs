@@ -11,14 +11,19 @@ namespace PacketGenerator
 
         static void Main(string[] args)
         {
+            string pdlPath = "../PDL.xml";
+
             XmlReaderSettings settings = new XmlReaderSettings()
             {
                 IgnoreComments = true,  // 주석 무시
                 IgnoreWhitespace = true // 스페이스바 무시
             };
 
+            if(args.Length >= 1)
+                pdlPath = args[0];
+
             // using 사용 시 using을 벗어날 시 자동으로 r.Dispose() 실행됨
-            using (XmlReader r = XmlReader.Create("PDL.xml", settings))
+            using (XmlReader r = XmlReader.Create(pdlPath, settings))
             {
                 r.MoveToContent();  // 헤더를 건더뛰고 핵심 내용부터 읽는다
 
