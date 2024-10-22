@@ -11,6 +11,28 @@ namespace PacketGenerator
         // 여러줄에 걸쳐서 문자열을 정의하고 싶으면 앞에 @를 붙인다.
         // tap 땡기기 : shift + tap
 
+        // {0} 패킷 이름/번호 목록
+        // {1} 패킷 목록
+        public static string fileFormat =
+@"using ServerCore;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Net;
+
+public enum PacketID
+{{
+    {0}
+}}
+
+{1}
+";
+
+        // {0} 패킷 이름
+        // {1} 패킷 번호
+        public static string packetEnumFormat =
+@"{0} = {1},";
+
         // {0} 패킷 이름
         // {1} 멤버 변수들
         // {2} 멤버 변수 Read
@@ -61,7 +83,7 @@ class {0}
         // {3} 멤버 변수 Read
         // {4} 멤버 변수 Write
         public static string memberListFormat =
-@"public struct {0}
+@"public class {0}
 {{
     {2}
 
@@ -85,6 +107,12 @@ public List<{0}> {1}s = new List<{0}>();";
         public static string readFormat =
 @"this.{0} = BitConverter.{1}(s.Slice(count, s.Length - count));
 count += sizeof({2});";
+
+        // {0} 변수 이름
+        // {1} 변수 타입
+        public static string readByteFormat =
+@"this.{0} = ({1})segment.Array[segment.Offset + count];
+count += sizeof({1});";
 
         // {0} 변수 이름
         public static string readStringFormat =
@@ -111,6 +139,12 @@ for (int i = 0; i < (int){1}Len; ++i)
         // {1} 변수 타입
         public static string writeFormat =
 @"success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.{0});
+count += sizeof({1});";
+
+        // {0} 변수 이름
+        // {1} 변수 타입
+        public static string writeByteFormat =
+@"segment.Array[segment.Offset + count] = (byte)this.{0};
 count += sizeof({1});";
 
         // {0} 변수 이름
