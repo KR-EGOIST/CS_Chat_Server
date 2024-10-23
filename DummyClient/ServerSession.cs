@@ -32,7 +32,7 @@ namespace DummyClient
             Span<byte> s = new Span<byte>(segment.Array, segment.Offset, segment.Count);
 
             count += sizeof(ushort);
-            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)PacketID.Test);
+            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)PacketID.S_Test);
             count += sizeof(ushort);
             success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.testInt);
             count += sizeof(int);
@@ -49,13 +49,13 @@ namespace DummyClient
         {
             Console.WriteLine($"OnConnected: {endPoint}");
 
-            PlayerInfoReq packet = new PlayerInfoReq() { playerId = 1001, name = "ABCD" };
-            var skill = new PlayerInfoReq.Skill() { id = 101, level = 1, duration = 3.0f };
-            skill.attributes.Add(new PlayerInfoReq.Skill.Attribute() { att = 77 });
+            C_PlayerInfoReq packet = new C_PlayerInfoReq() { playerId = 1001, name = "ABCD" };
+            var skill = new C_PlayerInfoReq.Skill() { id = 101, level = 1, duration = 3.0f };
+            skill.attributes.Add(new C_PlayerInfoReq.Skill.Attribute() { att = 77 });
             packet.skills.Add(skill);
-            packet.skills.Add(new PlayerInfoReq.Skill() { id = 201, level = 2, duration = 5.0f });
-            packet.skills.Add(new PlayerInfoReq.Skill() { id = 301, level = 3, duration = 7.0f });
-            packet.skills.Add(new PlayerInfoReq.Skill() { id = 401, level = 4, duration = 9.0f });
+            packet.skills.Add(new C_PlayerInfoReq.Skill() { id = 201, level = 2, duration = 5.0f });
+            packet.skills.Add(new C_PlayerInfoReq.Skill() { id = 301, level = 3, duration = 7.0f });
+            packet.skills.Add(new C_PlayerInfoReq.Skill() { id = 401, level = 4, duration = 9.0f });
 
             try
             {

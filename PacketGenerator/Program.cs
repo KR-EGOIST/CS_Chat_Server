@@ -8,6 +8,8 @@ namespace PacketGenerator
         static ushort packetId;
         static string packetEnums;
 
+        static string clientRegister;
+        static string serverRegister;
 
         static void Main(string[] args)
         {
@@ -41,6 +43,11 @@ namespace PacketGenerator
                 // 기존 genPackets 내용에 using 라이브러리와 enum PacketID 추가
                 string fileText = string.Format(PacketFormat.fileFormat, packetEnums, genPackets);
                 File.WriteAllText("GenPackets.cs", fileText);
+                // 서버와 클라 각각의 PacketManager 생성
+                string clientManagerText = string.Format(PacketFormat.managerFormat, clientRegister);
+                File.WriteAllText("ClientPacketManager.cs", clientManagerText);
+                string serverManagerText = string.Format(PacketFormat.managerFormat, serverRegister);
+                File.WriteAllText("ServerPacketManager.cs", serverManagerText);
             }
         }
         public static void ParsePacket(XmlReader r)
@@ -67,6 +74,11 @@ namespace PacketGenerator
             genPackets += string.Format(PacketFormat.packetFormat, packetName, t.Item1, t.Item2, t.Item3);
             // packetEnums에 패킷 이름과 번호를 매긴다. 번호는 1부터 순차적으로 증가
             packetEnums += string.Format(PacketFormat.packetEnumFormat, packetName, ++packetId) + Environment.NewLine + "\t";
+            // 서버에서 클라로 보내는 패킷인지, 클라에서 서버로 보내는 패킷인지 구분
+            if (packetName.StartsWith("S_") || packetName.StartsWith("s_"))
+                clientRegister += string.Format(PacketFormat.managerRegisterFormat, packetName) + Environment.NewLine;
+            else 
+                serverRegister += string.Format(PacketFormat.managerRegisterFormat, packetName) + Environment.NewLine;
         }
     
 

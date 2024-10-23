@@ -32,7 +32,7 @@ namespace Server
             Span<byte> s = new Span<byte>(segment.Array, segment.Offset, segment.Count);
 
             count += sizeof(ushort);
-            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)PacketID.Test);
+            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)PacketID.S_Test);
             count += sizeof(ushort);
             success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.testInt);
             count += sizeof(int);

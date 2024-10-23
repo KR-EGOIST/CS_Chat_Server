@@ -6,10 +6,68 @@ using System.Threading.Tasks;
 
 namespace PacketGenerator
 {
+    // 여러줄에 걸쳐서 문자열을 정의하고 싶으면 앞에 @를 붙인다.
+    // tap 땡기기 : shift + tap
     class PacketFormat
     {
-        // 여러줄에 걸쳐서 문자열을 정의하고 싶으면 앞에 @를 붙인다.
-        // tap 땡기기 : shift + tap
+        // {0} 패킷 등록
+        public static string managerFormat =
+@"using ServerCore;
+using System;
+using System.Collections.Generic;
+
+class PacketManager
+{{
+    #region Singleton
+    static PacketManager _Instance;
+    public static PacketManager Instance
+    {{
+        get
+        {{
+            if (_Instance == null)
+                _Instance = new PacketManager();
+            return _Instance;
+        }}
+    }}
+    #endregion
+
+    Dictionary<ushort, Action<PacketSession, ArraySegment<byte>>> _onRecv = new Dictionary<ushort, Action<PacketSession, ArraySegment<byte>>> ();
+    Dictionary<ushort, Action<PacketSession, IPacket>> _handler = new Dictionary<ushort, Action<PacketSession, IPacket>>();
+
+    public void Register()
+    {{
+{0}
+    }}
+
+    public void OnRecvPacket(PacketSession session, ArraySegment<byte> buffer)
+    {{
+        ushort count = 0;
+
+        ushort size = BitConverter.ToUInt16(buffer.Array, buffer.Offset);
+        count += 2;
+        ushort id = BitConverter.ToUInt16(buffer.Array, buffer.Offset + count);
+        count += 2;
+
+        Action<PacketSession, ArraySegment<byte>> action = null;
+        if (_onRecv.TryGetValue(id, out action))
+            action.Invoke(session, buffer);
+    }}
+
+    void MakePacket<T>(PacketSession session, ArraySegment<byte> buffer) where T : IPacket, new()
+    {{
+        T pkt = new T();
+        pkt.Read(buffer);
+
+        Action<PacketSession, IPacket> action = null;
+        if (_handler.TryGetValue(pkt.Protocol, out action))
+            action.Invoke(session, pkt);
+    }}
+}}";
+
+        // {0} 패킷 이름
+        public static string managerRegisterFormat =
+@"        _onRecv.Add((ushort)PacketID.{0}, MakePacket<{0}>);
+        _handler.Add((ushort)PacketID.{0}, PacketHandler.{0}Handler);";
 
         // {0} 패킷 이름/번호 목록
         // {1} 패킷 목록
