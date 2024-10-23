@@ -8,41 +8,6 @@ using System.Threading.Tasks;
 
 namespace DummyClient
 {
-    class Test
-    {
-        public int testInt;
-
-        public void Read(ArraySegment<byte> segment)
-        {
-            ushort count = 0;
-
-            ReadOnlySpan<byte> s = new ReadOnlySpan<byte>(segment.Array, segment.Offset, segment.Count);
-            count += sizeof(ushort);
-            count += sizeof(ushort);
-            this.testInt = BitConverter.ToInt32(s.Slice(count, s.Length - count));
-            count += sizeof(int);
-        }
-
-        public ArraySegment<byte> Write()
-        {
-            ArraySegment<byte> segment = SendBufferHelper.Open(4096);
-            ushort count = 0;
-            bool success = true;
-
-            Span<byte> s = new Span<byte>(segment.Array, segment.Offset, segment.Count);
-
-            count += sizeof(ushort);
-            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), (ushort)PacketID.S_Test);
-            count += sizeof(ushort);
-            success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.testInt);
-            count += sizeof(int);
-            success &= BitConverter.TryWriteBytes(s, count);
-            if (success == false)
-                return null;
-            return SendBufferHelper.Close(count);
-        }
-    }
-
     class ServerSession : Session
     {
         public override void OnConnected(EndPoint endPoint)
@@ -59,13 +24,10 @@ namespace DummyClient
 
             try
             {
-                //for (int i = 0; i < 5; ++i)
-                {
-                    ArraySegment<byte> sendBuff = packet.Write();
+                ArraySegment<byte> sendBuff = packet.Write();
 
-                    if(sendBuff != null)
-                        Send(sendBuff);
-                }
+                if(sendBuff != null)
+                    Send(sendBuff);
             }
             catch (Exception e)
             {
