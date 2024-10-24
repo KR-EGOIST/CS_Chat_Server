@@ -19,17 +19,14 @@ using System.Collections.Generic;
 class PacketManager
 {{
     #region Singleton
-    static PacketManager _Instance;
-    public static PacketManager Instance
-    {{
-        get
-        {{
-            if (_Instance == null)
-                _Instance = new PacketManager();
-            return _Instance;
-        }}
-    }}
+    static PacketManager _Instance = new PacketManager();
+    public static PacketManager Instance {{  get {{ return _Instance; }} }}
     #endregion
+
+    PacketManager()
+    {{
+        Register();
+    }}
 
     Dictionary<ushort, Action<PacketSession, ArraySegment<byte>>> _onRecv = new Dictionary<ushort, Action<PacketSession, ArraySegment<byte>>> ();
     Dictionary<ushort, Action<PacketSession, IPacket>> _handler = new Dictionary<ushort, Action<PacketSession, IPacket>>();
