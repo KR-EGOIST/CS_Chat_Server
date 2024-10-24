@@ -17,19 +17,23 @@ namespace DummyClient
 
             Connector connector = new Connector();
 
-            connector.Connect(endPoint, () => { return new ServerSession(); });
+            connector.Connect(endPoint, 
+                () => { return SessionManager.Instance.Generate(); }, 
+                10);
 
             while (true)
             {
                 try
                 {
+                    // 모든 세션들이 채팅 메시지를 서버 쪽으로 날려주는 작업을 한다.
+                    SessionManager.Instance.SendForEach();
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
                 }
 
-                Thread.Sleep(1000);
+                Thread.Sleep(250);
             }
         }
     }

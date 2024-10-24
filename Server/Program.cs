@@ -12,8 +12,6 @@ namespace Server
 
         static void Main(string[] args)
         {
-            PacketManager.Instance.Register();  // 멀티쓰레드 환경이 되기 전에 패킷 등록
-
             // DNS (Domain Name System)
             string host = Dns.GetHostName();
             IPHostEntry ipHost = Dns.GetHostEntry(host);
