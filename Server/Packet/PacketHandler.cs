@@ -20,7 +20,11 @@ class PacketHandler
         if (clientSession.Room == null)
             return;
 
+        // JobQueue에 broadcast 행동을 집어 넣는다.
         // Room에 있는 모든 사람에게 chat내용을 보낸다.
-        clientSession.Room.Broadcast(clientSession, chatPacket.chat);
+        GameRoom room = clientSession.Room;
+        room.Push(
+            () => room.Broadcast(clientSession, chatPacket.chat)
+        );
     }
 }
