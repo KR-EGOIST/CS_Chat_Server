@@ -13,7 +13,7 @@ namespace ServerCore
         public static ThreadLocal<SendBuffer> CurrentBuffer = new ThreadLocal<SendBuffer>(() => { return null; });
 
         // 외부에서 ChunkSize를 조정하고 싶을 때 사용
-        public static int ChunkSize { get; set; } = 4096 * 100;
+        public static int ChunkSize { get; set; } = 65535 * 100;
 
         public static ArraySegment<byte> Open(int reserveSize)
         {

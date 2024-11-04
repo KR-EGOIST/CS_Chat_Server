@@ -18,6 +18,7 @@ namespace ServerCore
         {
             // [size(2)][packetId(2)][ ... ][size(2)][packetId(2)][ ... ]
             int processLen = 0;
+            int pakcetCount = 0;
 
             while (true)
             {
@@ -34,10 +35,14 @@ namespace ServerCore
                 // 1개의 패킷의 유효 범위를 전달해서 처리
                 OnRecvPacket(new ArraySegment<byte>(buffer.Array, buffer.Offset, dataSize));
 
+                pakcetCount++;
                 processLen += dataSize;
                 // 다음 패킷 부분을 가리키기 위해서 Offset과 버퍼의 크기 변경
                 buffer = new ArraySegment<byte>(buffer.Array, buffer.Offset + dataSize, buffer.Count - dataSize);
             }
+
+            if(pakcetCount > 1)
+                Console.WriteLine($"패킷 모아 보내기 : {pakcetCount}");
 
             return processLen;
         }
@@ -50,7 +55,7 @@ namespace ServerCore
         Socket _socket;
         int _disconnected = 0;
 
-        RecvBuffer _recvBuffer = new RecvBuffer(1024);
+        RecvBuffer _recvBuffer = new RecvBuffer(65535);
 
         object _lock = new object();
         Queue<ArraySegment<byte>> _sendQueue = new Queue<ArraySegment<byte>>();
@@ -81,6 +86,21 @@ namespace ServerCore
             _recvArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnRecvCompleted);
 
             RegisterRecv();
+        }
+
+        public void Send(List<ArraySegment<byte>> sendBuffList)
+        {
+            if (sendBuffList.Count == 0)
+                return;
+
+            lock (_lock)
+            {
+                foreach(ArraySegment<byte> sendBuff in sendBuffList)
+                    _sendQueue.Enqueue(sendBuff);
+
+                if (_pendingList.Count == 0)
+                    RegisterSend();
+            }
         }
 
         public void Send(ArraySegment<byte> sendBuff)

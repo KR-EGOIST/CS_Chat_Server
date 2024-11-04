@@ -13,7 +13,7 @@ namespace ServerCore
         Socket _listenSocket;
         Func<Session> _sessionFactory;
 
-        public void Init(IPEndPoint endPoint, Func<Session> sessionFactory)
+        public void Init(IPEndPoint endPoint, Func<Session> sessionFactory, int register = 10, int backlog = 100)
         {
             // 문지기
             _listenSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -23,9 +23,10 @@ namespace ServerCore
             _listenSocket.Bind(endPoint);
 
             // 영업 시작
-            _listenSocket.Listen(10);
+            _listenSocket.Listen(backlog);
 
-            for(int i = 0; i < 10; i++)
+            // 문지기 역할
+            for(int i = 0; i < register; i++)
             {
                 SocketAsyncEventArgs args = new SocketAsyncEventArgs();
                 args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted);
