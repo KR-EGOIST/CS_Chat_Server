@@ -77,3 +77,5 @@
 
 #### 13. Unity 연동 테스트
   - 클라이언트에 NetworkManager 구현 및 테스트
+  - NetworkManager 즉, 메인쓰레드에서 작업을 처리해야하므로 PacketQueue 구현
+  - 클라이언트에서 간단한 패킷 전송 테스트
